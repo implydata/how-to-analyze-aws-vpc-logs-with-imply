@@ -1,0 +1,611 @@
+{
+  "dataCubes": [
+    {
+      "name": "aws-vpc-flow",
+      "title": "AWS VPC Flow",
+      "description": "AWS VPC Data ingested via Kinesis and Cloudwatch",
+      "connectionName": "druid",
+      "source": "aws_vpc_flow_logs",
+      "theme": "tangerine",
+      "options": {},
+      "readAccess": {
+        "access": "all"
+      },
+      "modifyAccess": {
+        "access": "all"
+      },
+      "attributes": [
+        {
+          "name": "__time",
+          "type": "TIME",
+          "nativeType": "__time"
+        }
+      ],
+      "dimensions": [
+        {
+          "name": "__time",
+          "title": "Time",
+          "formula": "$__time",
+          "type": "TIME",
+          "granularities": [
+            "PT10M",
+            "PT30M",
+            "PT1H",
+            "PT4H",
+            "P1D"
+          ]
+        },
+        {
+          "name": "account-id",
+          "title": "Account ID",
+          "formula": "${account-id}",
+          "type": "STRING"
+        },
+        {
+          "name": "logGrou-d0b",
+          "title": "VPC",
+          "formula": "$logGroup",
+          "type": "STRING"
+        },
+        {
+          "name": "interface-id",
+          "title": "Interface",
+          "formula": "${interface-id}",
+          "type": "STRING"
+        },
+        {
+          "name": "action",
+          "title": "Action",
+          "formula": "$action",
+          "type": "STRING"
+        },
+        {
+          "name": "dstaddr",
+          "title": "Dest Address",
+          "group": "Destination",
+          "formula": "$dstaddr",
+          "type": "STRING"
+        },
+        {
+          "name": "dstport",
+          "title": "Dest Port",
+          "group": "Destination",
+          "formula": "$dstport",
+          "type": "STRING"
+        },
+        {
+          "name": "srcaddr",
+          "title": "Src Address",
+          "group": "Source",
+          "formula": "$srcaddr",
+          "type": "STRING"
+        },
+        {
+          "name": "srcport",
+          "title": "Src Port",
+          "group": "Source",
+          "formula": "$srcport",
+          "type": "STRING"
+        },
+        {
+          "name": "protocol",
+          "title": "Protocol",
+          "formula": "$protocol",
+          "type": "STRING"
+        },
+        {
+          "name": "log-status",
+          "title": "Log Status",
+          "formula": "${log-status}",
+          "type": "STRING"
+        },
+        {
+          "name": "version",
+          "title": "Version",
+          "formula": "$version",
+          "type": "STRING"
+        },
+        {
+          "name": "column-a8c",
+          "title": "Flow ID (addr)",
+          "formula": "$srcdstaddr",
+          "type": "STRING"
+        },
+        {
+          "name": "srcdsta-a73",
+          "title": "Flow ID (addr:port)",
+          "formula": "$srcdstaddrport",
+          "type": "STRING"
+        }
+      ],
+      "measures": [
+        {
+          "name": "count",
+          "title": "Count (flows)",
+          "formula": "$main.count()",
+          "numberStyle": {
+            "type": "si",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "integer": true,
+            "abbreviationSpace": true
+          },
+          "missingValueFill": "zero"
+        },
+        {
+          "name": "sum_bytes",
+          "title": "Bytes (total)",
+          "formula": "$main.sum($bytes)",
+          "numberStyle": {
+            "type": "byte-decimal",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          }
+        },
+        {
+          "name": "sumbyte-f01",
+          "title": "bps",
+          "formula": "$main.sum($bytes) / $MillisecondsInInterval * 8000",
+          "numberStyle": {
+            "type": "bit-per-second-decimal",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          },
+          "missingValueFill": "previous"
+        },
+        {
+          "name": "sum_packets",
+          "title": "Packets (total)",
+          "formula": "$main.sum($packets)"
+        },
+        {
+          "name": "sumpack-b35",
+          "title": "Packets (per second)",
+          "formula": "$main.sum($packets) / $MillisecondsInInterval * 1000",
+          "numberStyle": {
+            "type": "si",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          }
+        },
+        {
+          "name": "sumpack-2bd",
+          "title": "Avg. Packet Size",
+          "formula": "$main.sum($bytes) / $main.sum($packets)",
+          "numberStyle": {
+            "type": "byte-iec",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          }
+        },
+        {
+          "name": "sumpack-1d2",
+          "title": "Packets 98th percentile",
+          "formula": "$main.quantile($packets,0.98)"
+        },
+        {
+          "name": "filtera-6ff",
+          "title": "Percent Accepted",
+          "formula": "$main.filter($action == 'ACCEPT').count() / $main.count()",
+          "numberStyle": {
+            "type": "percent",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          }
+        },
+        {
+          "name": "filtera-4d9",
+          "title": "Rejected Count",
+          "formula": "$main.filter($action == 'REJECT').count()",
+          "numberStyle": {
+            "type": "si",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "integer": true,
+            "abbreviationSpace": true
+          }
+        },
+        {
+          "name": "filtera-abf",
+          "title": "Percent Rejected",
+          "formula": "$main.filter($action == 'REJECT').count() / $main.count()",
+          "numberStyle": {
+            "type": "percent",
+            "leading": 1,
+            "minDecimals": 2,
+            "maxDecimals": 2,
+            "abbreviationSpace": true
+          }
+        }
+      ],
+      "specialTimeDimension": "__time",
+      "enforceTimeFilter": true,
+      "defaultTimezone": "America/Los_Angeles",
+      "defaultDuration": "PT1H",
+      "defaultPinnedDimensions": [
+        "action"
+      ]
+    }
+  ],
+  "dashboards": [
+    {
+      "name": "aws-vpc-flow-dashboard",
+      "title": "AWS VPC Flows",
+      "theme": "imply",
+      "readAccess": {
+        "access": "all"
+      },
+      "modifyAccess": {
+        "access": "all"
+      },
+      "enforceTimeFilter": true,
+      "pages": [
+        {
+          "name": "page",
+          "label": "New page",
+          "tiles": [
+            {
+              "name": "t760f",
+              "type": "visualization",
+              "title": "Traffic sources (by bytes)",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 8,
+                "height": 6,
+                "x": 8
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "P1D",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [
+                  {
+                    "dimension": "srcport",
+                    "sortType": "measure",
+                    "direction": "descending",
+                    "limit": 7
+                  },
+                  {
+                    "dimension": "srcaddr",
+                    "sortType": "measure",
+                    "direction": "descending"
+                  }
+                ],
+                "selectedMeasures": [
+                  "sum_bytes"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "sunburst",
+                "visualizationOptions": {
+                  "showOverall": "off"
+                }
+              }
+            },
+            {
+              "name": "t814e",
+              "type": "visualization",
+              "title": "Bytes",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 4,
+                "height": 3,
+                "x": 12,
+                "y": 9
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "P1D",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [],
+                "selectedMeasures": [
+                  "sum_bytes"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "totals"
+              }
+            },
+            {
+              "name": "d237",
+              "type": "visualization",
+              "title": "Traffic destinations (by bytes)",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 8,
+                "height": 6
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "PT6H",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [
+                  {
+                    "dimension": "dstport",
+                    "sortType": "measure",
+                    "direction": "descending",
+                    "limit": 7
+                  },
+                  {
+                    "dimension": "dstaddr",
+                    "sortType": "measure",
+                    "direction": "descending"
+                  }
+                ],
+                "selectedMeasures": [
+                  "sum_bytes"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "sunburst",
+                "visualizationOptions": {
+                  "showOverall": "off"
+                }
+              }
+            },
+            {
+              "name": "t75f1",
+              "type": "visualization",
+              "title": "Flows by service (by bytes)",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 8,
+                "height": 6,
+                "x": 16
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "P1D",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [
+                  {
+                    "dimension": "srcaddr-4b4",
+                    "sortType": "measure",
+                    "direction": "descending",
+                    "limit": 10
+                  },
+                  {
+                    "dimension": "dstaddr-f05",
+                    "sortType": "measure",
+                    "direction": "descending",
+                    "limit": 10
+                  }
+                ],
+                "selectedMeasures": [
+                  "sum_bytes"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "sunburst"
+              }
+            },
+            {
+              "name": "t0c5c",
+              "type": "visualization",
+              "title": "Traffic breakdown",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 8,
+                "height": 6,
+                "x": 16,
+                "y": 6
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "P1D",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [
+                  {
+                    "dimension": "srcdsta-a73",
+                    "sortType": "measure",
+                    "direction": "descending"
+                  }
+                ],
+                "selectedMeasures": [
+                  "sum_bytes"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "table",
+                "visualizationOptions": {
+                  "showOverall": "off",
+                  "showBars": "on",
+                  "showHeaders": "on"
+                }
+              }
+            },
+            {
+              "name": "t6f3c",
+              "type": "visualization",
+              "title": "Flows",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 4,
+                "height": 3,
+                "x": 12,
+                "y": 6
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "P1D",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [],
+                "selectedMeasures": [
+                  "count"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "totals",
+                "compare": {
+                  "type": "relative",
+                  "duration": "P1D"
+                }
+              }
+            },
+            {
+              "name": "t01",
+              "type": "visualization",
+              "title": "Traffic (bits/sec)",
+              "canExpand": true,
+              "description": "",
+              "position": {
+                "width": 12,
+                "height": 6,
+                "y": 6
+              },
+              "essence": {
+                "dataCube": "aws-vpc-flow",
+                "timezone": "Etc/UTC",
+                "filter": {
+                  "clauses": [
+                    {
+                      "dimension": "__time",
+                      "dynamic": {
+                        "op": "timeRange",
+                        "operand": {
+                          "op": "ref",
+                          "name": "m"
+                        },
+                        "duration": "PT1H",
+                        "step": -1
+                      }
+                    }
+                  ]
+                },
+                "splits": [
+                  {
+                    "dimension": "__time",
+                    "bucketAction": {
+                      "op": "timeBucket",
+                      "duration": "PT10M"
+                    },
+                    "sortType": "dimension",
+                    "direction": "ascending"
+                  }
+                ],
+                "selectedMeasures": [
+                  "sumbyte-f01"
+                ],
+                "pinnedDimensions": [],
+                "visualization": "line-chart",
+                "visualizationOptions": {
+                  "showOverall": "off"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "filterTile": "show",
+      "defaultFilters": [
+        {
+          "dimension": "__time"
+        }
+      ],
+      "hasGlobalCompare": true,
+      "hasGlobalMeasures": true
+    }
+  ]
+}

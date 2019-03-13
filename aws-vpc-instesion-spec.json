@@ -1,0 +1,126 @@
+{
+  "type": "kinesis",
+  "dataSchema": {
+    "dataSource": "aws_vpc_flow_logs",
+    "parser": {
+      "type": "cloudwatch",
+      "parseSpec": {
+        "format": "tsv",
+        "delimiter": " ",
+        "timestampSpec": {
+          "column": "start",
+          "format": "posix"
+        },
+        "columns": [
+          "version",
+          "account-id",
+          "interface-id",
+          "srcaddr",
+          "dstaddr",
+          "srcport",
+          "dstport",
+          "protocol",
+          "packets",
+          "bytes",
+          "start",
+          "end",
+          "action",
+          "log-status",
+          "owner",
+          "logGroup",
+          "logStream"
+        ],
+        "dimensionsSpec": {
+          "dimensions": [{
+              "name": "owner",
+              "type": "string"
+            },
+            {
+              "name": "logGroup",
+              "type": "string"
+            },
+            {
+              "name": "logStream",
+              "type": "string"
+            },
+            {
+              "name": "version",
+              "type": "string"
+            },
+            {
+              "name": "account-id",
+              "type": "string"
+            },
+            {
+              "name": "interface-id",
+              "type": "string"
+            },
+            {
+              "name": "srcaddr",
+              "type": "string"
+            },
+            {
+              "name": "dstaddr",
+              "type": "string"
+            },
+            {
+              "name": "srcport",
+              "type": "string"
+            },
+            {
+              "name": "dstport",
+              "type": "string"
+            },
+            {
+              "name": "protocol",
+              "type": "string"
+            },
+            {
+              "name": "action",
+              "type": "string"
+            },
+            {
+              "name": "log-status",
+              "type": "string"
+            }
+          ]
+        }
+      }
+    },
+    "metricsSpec": [],
+    "granularitySpec": {
+      "type": "uniform",
+      "segmentGranularity": "HOUR",
+      "queryGranularity": {
+        "type": "none"
+      },
+      "rollup": false,
+      "intervals": null
+    },
+    "transformSpec": {
+      "filter": null,
+      "transforms": [{
+         "type": "expression",
+          "name": "srcdstaddr",
+          "expression": "concat(srcaddr,',',dstaddr)"
+        },
+        {
+          "type": "expression",
+          "name": "srcdstaddrport",
+          "expression": "concat(srcaddr,':',srcport,',',dstaddr,':',dstport)"
+        }
+      ]
+    }
+  },
+  "tuningConfig": {
+    "type": "kinesis",
+    "maxRowsInMemory": 1000000,
+    "maxRowsPerSegment": 5000000
+  },
+  "ioConfig": {
+    "stream": "vpc-logs",
+    "endpoint": "kinesis.us-east-1.amazonaws.com",
+    "awsAccessKeyId": "your_access_key_id",
+    "awsSecretAccessKey": "your_secrety_access_key",
+  }
+}
